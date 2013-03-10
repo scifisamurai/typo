@@ -1,0 +1,15 @@
+Feature: Create Blog
+  As an author
+  In order to gift my thoughts to the world
+  I want to create a blog
+
+  Scenario: Create blog page shown      #features/create_blog.feature:6
+    Given I am on the home page         #features/step_definitions/web_steps.rb:68
+    Then I should see "Welcome"         #features/step_definitions/web_steps.rb:129
+    And I should see "My Shiny Weblog!" #features/step_definitions/web_steps.rb:129
+
+  Scenario: Create blog page not shown when blog created #features/create_blog.feature:11
+    Given the blog is set up                   #features/step_definitions/web_steps.rb:34
+    When I am on the home page                 #features/step_definitions/web_steps.rb:68
+    Then I should not see "My Shiny Weblog!"   #features/step_definitions/web_steps.rb:147
+    And I should see "Teh Blag"                #features/step_definitions/web_steps.rb:129

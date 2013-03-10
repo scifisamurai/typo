@@ -43,6 +43,49 @@ Given /^the blog is set up$/ do
                 :state => 'active'})
 end
 
+And /^the publisher has been created$/ do
+  User.create!({:login => 'publisher',
+                :password => 'publisher',
+                :email => 'publisher@snow.com',
+                :profile_id => 2,
+                :name => 'publisher',
+                :state => 'active'})
+end
+
+And /^"([^"]*)" has commented on "([^"]*)" with "([^"]*)"$/ do |author, article_title, body|
+  a = Article.where({:title => article_title, :state => "published"}).first
+  ##Create a new comment
+      Comment.create!({:author => author,
+                  :article => a,
+                  :body => body,
+                  :ip => '1.2.3.4'})
+end
+
+
+And /^the "([^"]*)" article has been created by "([^"]*)" with "([^"]*)" body text$/ do |title, author, body|
+  Article.create!({:title => title,
+                  :author => author,
+                  :body => body,
+                  :user_id => 1,
+                  :published => true})
+ # Article.all.each do |article|
+    #puts "ID:#{article.id}, title: #{article.title}"
+    #p article
+ # end
+end
+
+Given /^I am logged into the admin panel as a publisher$/ do
+  visit '/accounts/login'
+  fill_in 'user_login', :with => 'publisher'
+  fill_in 'user_password', :with => 'publisher'
+  click_button 'Login'
+  if page.respond_to? :should
+    page.should have_content('Login successful')
+  else
+    assert page.has_content?('Login successful')
+  end
+end
+
 And /^I am logged into the admin panel$/ do
   visit '/accounts/login'
   fill_in 'user_login', :with => 'admin'
@@ -124,6 +167,11 @@ end
 
 When /^(?:|I )attach the file "([^"]*)" to "([^"]*)"$/ do |path, field|
   attach_file(field, File.expand_path(path))
+end
+
+Then /^"([^"]*)" should have either "([^"]*)" or "([^"]*)" as the author$/ do |article_title, author1, author2|
+  a = Article.where({:title => article_title, :state => "published"}).first
+  assert a.author == author1 || a.author == author2
 end
 
 Then /^(?:|I )should see "([^"]*)"$/ do |text|

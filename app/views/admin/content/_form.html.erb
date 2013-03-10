@@ -147,6 +147,12 @@
       <%= render 'admin/content/attachment', { :attachment_num => 1, :hidden => false } -%>
     </ul>
   </div>    
+
+  <div id='merge_articles' <%= "style='display: none;'" if @article.id.nil? %> >
+    <h4><%= _("Merge Articles") %></h4>
+    <%= _("Article ID") %> <%= text_field 'article', 'merge_with', { :name => 'merge_with'} %>
+    <input id='merge' type="submit" value="<%= _('Merge') %>" name="article[merge]" />
+  </div>
   </div>
 
 </div>

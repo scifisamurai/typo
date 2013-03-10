@@ -142,6 +142,7 @@ class Admin::ContentController < Admin::BaseController
   def new_or_edit
     id = params[:id]
     id = params[:article][:id] if params[:article] && params[:article][:id]
+    #retrieve the article if id != nil, otherwise make a new article & fill it
     @article = Article.get_or_build_article(id)
     @article.text_filter = current_user.text_filter if current_user.simple_editor?
 
@@ -149,6 +150,40 @@ class Admin::ContentController < Admin::BaseController
     if request.post?
       if params[:article][:draft]
         get_fresh_or_existing_draft_for_article
+      elsif params[:article][:merge]
+        #Redirect the user back to the index if they didn't provide an article id to merge with
+        if params[:merge_with] == "" 
+          redirect_to :action => 'index'
+          flash[:error] = _("Error, no Article ID provided")
+          return 
+        #Redirect the user back to the index if no article exists with the id they specified
+        elsif Article.exists?(params[:merge_with]) == false
+          redirect_to :action => 'index'
+          flash[:error] = _("Error, there is no article with id #{params[:merge_with]}")
+          return 
+        else
+          #puts "Inside merge condition in controller"
+          #p param
+          # puts "ID: #{@article.id}"
+          # puts "Merge ID: #{params[:merge_with]}"
+          #puts "Excerpt"
+          #p @article.excerpt
+
+          #print "Body & Extended:" 
+          #p @article.body_and_extended
+
+          #puts "Comments:"
+          #p @article.comments
+          
+          @article.merge_with(params[:merge_with])
+          #puts "Printing article after merge"
+          #p @article
+
+          set_the_flash
+          redirect_to :action => 'index'
+          return
+        end
+
       else
         if not @article.parent_id.nil?
           @article = Article.find(@article.parent_id)

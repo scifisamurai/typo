@@ -25,6 +25,7 @@ class Article < Content
 
   has_many :comments,   :dependent => :destroy, :order => "created_at ASC" do
 
+
     # Get only ham or presumed_ham comments
     def ham
       find :all, :conditions => {:state => ["presumed_ham", "ham"]}
@@ -80,7 +81,8 @@ class Article < Content
     Article.exists?({:parent_id => self.id})
   end
 
-  attr_accessor :draft, :keywords
+  attr_accessor :draft, :keywords, :merge
+  attr_writer :merge_with
 
   has_state(:state,
             :valid_states  => [:new, :draft,
@@ -414,6 +416,26 @@ class Article < Content
 
   def access_by?(user)
     user.admin? || user_id == user.id
+  end
+
+  def merge_with(other_article_id = 0)
+    unless other_article_id == 0
+      #puts "Merging article #{self.id} with #{other_article_id}"
+      article_to_merge = Article.find(other_article_id)
+      self.body = self.body.to_s + article_to_merge.body 
+      self.extended = self.extended + article_to_merge.extended unless article_to_merge.extended.nil? 
+
+      #Add the contents of both comment arrays 
+      self.comments += article_to_merge.comments 
+      self.save
+      #Reload the article to destroy
+      #NOTE: This is needed due to the dependent:destroy clause on the comments associated with an article
+      #which deletes any associated comments when an article is deleted.  Since we originally got this article
+      #when the comment was assigned to it, that was cached.  Hence if we do not re-get it those comments
+      #will be destroyed :(... Hence re-get the article
+      article_to_destroy = Article.find(other_article_id)
+      article_to_destroy.destroy
+    end
   end
 
   protected

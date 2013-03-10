@@ -184,7 +184,36 @@ describe Article do
   ### XXX: Should we have a test here?
   it "test_send_multiple_pings" do
   end
-  
+ 
+  it "Testing Article Creation" do
+    #Create one article
+      a = Article.create(:title => "Star Trek", :author => "admin", :body => "Kirk", :published => true)
+      #puts "ID of David article: #{a.id}"
+      Comment.create!({:author => 'Bob',
+                  :article => a,
+                  :body => 'nice post',
+                  :ip => '1.2.3.4'})
+      #p a
+      #p a.comments
+    #Create a second article
+      b = Article.create(:title => "Star Trek 2", :author => "publisher", :body => "Sisko", :published => true)
+      Comment.create!({:author => 'Mick',
+                  :article => b,
+                  :body => 'Wrath of Khan is overrated!',
+                  :ip => '4.5.6.7'})
+      #puts "ID of David 2nd article: #{b.id}"
+      #p b
+      #p b.comments
+    
+    #Merge the two articles
+      a.merge_with(b.id)
+      #p a
+      #p a.comments
+
+      #Make sure the article that was just merged no longer exists
+      #puts "Merged article exists: #{Article.exists?(b.id)}"
+  end
+
   describe "Testing redirects" do
     it "a new published article gets a redirect" do
       a = Article.create(:title => "Some title", :body => "some text", :published => true)
