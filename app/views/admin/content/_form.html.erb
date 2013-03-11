@@ -148,7 +148,7 @@
     </ul>
   </div>    
 
-  <div id='merge_articles' <%= "style='display: none;'" if @article.id.nil? %> >
+  <div id='merge_articles' <%= "style='display: none;'" if @article.id.nil? || current_user.id != 1 %> >
     <h4><%= _("Merge Articles") %></h4>
     <%= _("Article ID") %> <%= text_field 'article', 'merge_with', { :name => 'merge_with'} %>
     <br />
