@@ -435,6 +435,7 @@ class Article < Content
       #will be destroyed :(... Hence re-get the article
       article_to_destroy = Article.find(other_article_id)
       article_to_destroy.destroy
+      self
     end
   end
 
