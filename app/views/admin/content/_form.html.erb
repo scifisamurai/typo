@@ -151,7 +151,7 @@
   <% if @article.id.nil? == false && current_user.id == 1 %>
   <div id='merge_articles'>
     <h4><%= _("Merge Articles") %></h4>
-    <%= _("Article ID") %> <%= text_field 'article', 'merge_with', { :name => 'merge_with'} %>
+    <%= _("Article ID") %> <%= text_field 'article', 'merge_with', { :id => 'merge_with', :name => 'merge_with'} %>
     <br />
     <input id='merge' type="submit" value="<%= _('Merge') %>" name="article[merge]" />
   </div>
