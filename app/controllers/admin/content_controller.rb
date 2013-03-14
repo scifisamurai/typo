@@ -12,9 +12,15 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def merge
-    p params
-    @article = Article.find(params[:id])
+    #p params
 
+    if current_user.admin? == false
+      redirect_to :action => 'edit', :id => params[:id]
+      flash[:error] = _("Error, you are not allowed to perform this action")
+      return 
+    end
+
+    @article = Article.find(params[:id])
     if params[:merge_with] == "" 
       redirect_to :action => 'edit', :id => params[:id]
       flash[:error] = _("Error, no Article ID provided")
