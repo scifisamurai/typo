@@ -418,7 +418,7 @@ class Article < Content
   end
 
   def merge_with(other_article_id = 0)
-    unless other_article_id == 0 && user.admin == false
+    unless other_article_id == 0 && self.user.admin? == false
       #puts "Merging article #{self.id} with #{other_article_id}"
       article_to_merge = Article.find(other_article_id)
       self.body = self.body.to_s + article_to_merge.body 
