@@ -1,3 +1,29 @@
 <% @page_heading = _('New article') %>
 
 <%= render "admin/shared/edit", { :form_type => "article", :form_action => { :action => "new", :id => @article.id , :class => ('autosave')} } %>
+
+
+<%= form_tag :action => "merge", :id => @article.id do %>
+
+<input type="hidden" name="current_editor" id="current_editor" value="<%= current_user.editor %>" />
+<input type="hidden" name="user_textfilter" id="user_textfilter" value="<%= current_user.text_filter_name %>" />
+<div id="autosave"></div>
+<div id="article_keywords_auto_complete" class="auto_complete"></div>
+
+<%= error_messages_for 'article' %>
+
+<div class='editor-right'>
+</div>
+
+<div class='editor-left'>
+  <% if @article.id.nil? == false && current_user.id == 1 %>
+  <div id='merge_articles'>
+    <h4><%= _("Merge Articles") %></h4>
+    <%= _("Article ID") %> <%= text_field 'article', 'merge_with', { :id => 'merge_with', :name => 'merge_with'} %>
+    <br />
+    <input id='merge' type="submit" value="<%= _('Merge') %>"  />
+  </div>
+  <% end %>
+</div>
+
+<% end %>

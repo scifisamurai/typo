@@ -10,17 +10,17 @@
     <h4><%= _("Publish settings") %></h4>
     <div class='actions'>
       <%= link_to_destroy_with_profiles(@article) unless @article.id.nil? or @article.state.to_s.downcase == 'draft' %>
-	  <span id='destroy_link'><%= link_to_destroy_draft @article %></span>
+      <span id='destroy_link'><%= link_to_destroy_draft @article %></span>
       <span id='preview_link'><%= link_to(_("Preview"), {:controller => '/articles', :action => 'preview', :id => @article.id}, {:target => 'new', :class => 'btn info'}) if @article.id %></span>
     </div>
     <div class='clearfix'>
-        <%= _("Status:") %> <strong><%= @article.state.to_s.downcase %></strong> <a href="#" onclick="Element.toggle('status'); return false">Change</a>
+      <%= _("Status:") %> <strong><%= @article.state.to_s.downcase %></strong> <a href="#" onclick="Element.toggle('status'); return false">Change</a>
       <ul class='inputs-list'>
         <li id='status' style='display: none;'>        
-          <label for="article_published">
-            <%= check_box 'article', 'published'  %>
-            <%= _("Published") %>
-          </label>
+        <label for="article_published">
+          <%= check_box 'article', 'published'  %>
+          <%= _("Published") %>
+        </label>
         </li>
       </ul>
     </div>
@@ -28,24 +28,24 @@
       Comments are <strong>enabled</strong> and trackbacks are <strong>disabled</strong> <a href="#" onclick="Element.toggle('conversation'); return false">Change</a>
       <ul class='inputs-list' id='conversation' style='display: none'>
         <li>
-          <label for="article_allow_pings">
-            <%= check_box 'article', 'allow_pings' %>
-            <%= _("Allow trackbacks") %>
-          </label>
+        <label for="article_allow_pings">
+          <%= check_box 'article', 'allow_pings' %>
+          <%= _("Allow trackbacks") %>
+        </label>
         </li>
         <li>
-          <label for="article_allow_comments">
-            <%= check_box 'article', 'allow_comments' %>
-            <%= _("Allow comments") %>
-          </label>
+        <label for="article_allow_comments">
+          <%= check_box 'article', 'allow_comments' %>
+          <%= _("Allow comments") %>
+        </label>
         </li>
       </ul>
     </div>
-	  <div class='clearfix'>
+    <div class='clearfix'>
       <%= _("Publish <strong>now</strong>") %> <a href="#" onclick="Element.toggle('publish'); return false">Change</a>
       <ul class='inputs-list'>
         <li id='publish' style='display: none;'>
-          <%= calendar_date_select 'article', 'published_at', {:class => 'span3'} %>
+        <%= calendar_date_select 'article', 'published_at', {:class => 'span3'} %>
         </li>
       </ul>
     </div>
@@ -53,9 +53,9 @@
       <%= _("Visibility:") %> <strong>public</strong> <a href="#" onclick="Element.toggle('visibility'); return false">Change</a>
       <ul class='inputs-list' id='visibility' style='display: none'>
         <li>
-          <label for="article_password"><%= _("Password:") %>
-            <%= password_field :article, :password, :class => 'span3' %>
-          </label>
+        <label for="article_password"><%= _("Password:") %>
+          <%= password_field :article, :password, :class => 'span3' %>
+        </label>
         </li>
       </ul>
     </div>
@@ -63,7 +63,7 @@
       <%= _("Permalink:") %> <a href="#" onclick="Element.toggle('permalink'); return false">Change</a>
       <ul class='inputs-list' id='permalink' style='display: none'>
         <li>
-            <%= text_field 'article', 'permalink', {:class => 'span4'} %>
+        <%= text_field 'article', 'permalink', {:class => 'span4'} %>
         </li>
       </ul>
     </div>
@@ -71,9 +71,9 @@
       <%= _("Article filter") %>: <strong><%= @article.text_filter.description %></strong> <a href="#" onclick="Element.toggle('text_filter'); return false">Change</a>
       <ul id='text_filter' class='inputs-list' style='display: none'>
         <li>
-          <select name="article[text_filter]" id="text_filter">
-            <%= options_for_select text_filter_options, @article.text_filter %>
-          </select>
+        <select name="article[text_filter]" id="text_filter">
+          <%= options_for_select text_filter_options, @article.text_filter %>
+        </select>
         </li>
       </ul>
     </div>
@@ -100,14 +100,14 @@
     <%= render('images', { :images => @images}) unless @images.empty? %>
 
     <div id='editor-menu'>
-		<ul class="tabs">
-			<li id="f" class='<%= "active" if current_user.editor == 'visual' %>'>
-				<%= build_editor_link("Visual", 'insert_editor', 'fck', 'visual_editor', 'visual') %>
-			</li>
-			<li id="s" class='<%= "active" if current_user.editor == 'simple' %> '>
-				<%= build_editor_link("HTML", 'insert_editor', 'simple', 'simple_editor', 'simple') %>
-			</li>
-		</ul>
+      <ul class="tabs">
+        <li id="f" class='<%= "active" if current_user.editor == 'visual' %>'>
+        <%= build_editor_link("Visual", 'insert_editor', 'fck', 'visual_editor', 'visual') %>
+        </li>
+        <li id="s" class='<%= "active" if current_user.editor == 'simple' %> '>
+        <%= build_editor_link("HTML", 'insert_editor', 'simple', 'simple_editor', 'simple') %>
+        </li>
+      </ul>
     </div>
 
     <div id="editor">
@@ -125,7 +125,7 @@
       </div>
     </div>
 
-		<h4><%= _("Tags") %></h4>
+    <h4><%= _("Tags") %></h4>
     <div class='class'>
       <%= text_field 'article', 'keywords', {:autocomplete => 'off', :style => 'width: 100%'} %>
     </div>
@@ -148,15 +148,7 @@
     </ul>
   </div>    
 
-  <% if @article.id.nil? == false && current_user.id == 1 %>
-  <div id='merge_articles'>
-    <h4><%= _("Merge Articles") %></h4>
-    <%= _("Article ID") %> <%= text_field 'article', 'merge_with', { :id => 'merge_with', :name => 'merge_with'} %>
-    <br />
-    <input id='merge' type="submit" value="<%= _('Merge') %>" name="article[merge]" />
-  </div>
-  <% end %>
-  </div>
+</div>
 
 </div>
 

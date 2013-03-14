@@ -11,9 +11,51 @@ class Admin::ContentController < Admin::BaseController
     render :inline => "<%= raw auto_complete_result @items, 'name' %>"
   end
 
+  def merge
+    p params
+    @article = Article.find(params[:id])
+
+    if params[:merge_with] == "" 
+      redirect_to :action => 'edit', :id => params[:id]
+      flash[:error] = _("Error, no Article ID provided")
+      return 
+      #Redirect the user back to the index if no article exists with the id they specified
+    elsif Article.exists?(params[:merge_with]) == false
+      redirect_to :action => 'edit', :id => params[:id]
+      flash[:error] = _("Error, there is no article with id #{params[:merge_with]}")
+      return 
+    else
+      #puts "Inside merge condition in controller"
+      #p param
+      # puts "ID: #{@article.id}"
+      # puts "Merge ID: #{params[:merge_with]}"
+      #puts "Excerpt"
+      #p @article.excerpt
+
+      #print "Body & Extended:" 
+      #p @article.body_and_extended
+
+      #puts "Comments:"
+      #p @article.comments
+
+      @article.merge_with(params[:merge_with])
+      
+      #puts "Printing article after merge"
+      #p @article
+
+      #redirect_to :action => 'edit', :id => params[:id]
+      #flash[:error] = _("Error, there is no article with id #{params[:merge_with]}")
+      set_the_flash
+      redirect_to :action => 'index'
+      return
+    end
+    #redirect_to :action => 'index'
+    #return
+  end
+
   def index
     @search = params[:search] ? params[:search] : {}
-    
+
     @articles = Article.search_with_pagination(@search, {:page => params[:page], :per_page => this_blog.admin_display_elements})
 
     if request.xhr?
@@ -44,7 +86,7 @@ class Admin::ContentController < Admin::BaseController
       flash[:error] = _("Error, you are not allowed to perform this action")
       return(redirect_to :action => 'index')
     end
-    
+
     return(render 'admin/shared/destroy') unless request.post?
 
     @record.destroy
@@ -69,8 +111,8 @@ class Admin::ContentController < Admin::BaseController
     render :update do |page|
       page["attachment_add_#{params[:id]}"].remove
       page.insert_html :bottom, 'attachments',
-          :partial => 'admin/content/attachment',
-          :locals => { :attachment_num => params[:id], :hidden => true }
+        :partial => 'admin/content/attachment',
+        :locals => { :attachment_num => params[:id], :hidden => true }
       page.visual_effect(:toggle_appear, "attachment_#{params[:id]}")
     end
   end
@@ -92,7 +134,7 @@ class Admin::ContentController < Admin::BaseController
     @article.text_filter = current_user.text_filter if current_user.simple_editor?
 
     get_fresh_or_existing_draft_for_article
-    
+
     @article.attributes = params[:article]
     @article.published = false
     set_article_author
@@ -152,37 +194,6 @@ class Admin::ContentController < Admin::BaseController
         get_fresh_or_existing_draft_for_article
       elsif params[:article][:merge]
         #Redirect the user back to the index if they didn't provide an article id to merge with
-        if params[:merge_with] == "" 
-          redirect_to :action => 'index'
-          flash[:error] = _("Error, no Article ID provided")
-          return 
-        #Redirect the user back to the index if no article exists with the id they specified
-        elsif Article.exists?(params[:merge_with]) == false
-          redirect_to :action => 'index'
-          flash[:error] = _("Error, there is no article with id #{params[:merge_with]}")
-          return 
-        else
-          #puts "Inside merge condition in controller"
-          #p param
-          # puts "ID: #{@article.id}"
-          # puts "Merge ID: #{params[:merge_with]}"
-          #puts "Excerpt"
-          #p @article.excerpt
-
-          #print "Body & Extended:" 
-          #p @article.body_and_extended
-
-          #puts "Comments:"
-          #p @article.comments
-          
-          @article.merge_with(params[:merge_with])
-          #puts "Printing article after merge"
-          #p @article
-
-          set_the_flash
-          redirect_to :action => 'index'
-          return
-        end
 
       else
         if not @article.parent_id.nil?
@@ -194,13 +205,13 @@ class Admin::ContentController < Admin::BaseController
     @article.keywords = Tag.collection_to_string @article.tags
     @article.attributes = params[:article]
     # TODO: Consider refactoring, because double rescue looks... weird.
-        
+
     @article.published_at = DateTime.strptime(params[:article][:published_at], "%B %e, %Y %I:%M %p GMT%z").utc rescue Time.parse(params[:article][:published_at]).utc rescue nil
 
     if request.post?
       set_article_author
       save_attachments
-      
+
       @article.state = "draft" if @article.draft
 
       if @article.save
@@ -224,6 +235,8 @@ class Admin::ContentController < Admin::BaseController
       flash[:notice] = _('Article was successfully created')
     when 'edit'
       flash[:notice] = _('Article was successfully updated.')
+    when 'merge'
+      flash[:notice] = _('Article was successfully merged.')
     else
       raise "I don't know how to tidy up action: #{params[:action]}"
     end
