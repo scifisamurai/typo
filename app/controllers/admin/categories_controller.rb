@@ -22,62 +22,64 @@ class Admin::CategoriesController < Admin::BaseController
   end
 
   def new 
-    @category = Category.new
     @categories = Category.find(:all)
 
-    respond_to do |format|
-      format.html #new.html.erb
-      format.js { 
-        @category = Category.new
-      }
-    end
-  end
+    if request.post?  
+      @category = Category.new(params[:category])
 
-  def create
-    @category = Category.new(params[:category])
-    @categories = Category.find(:all)
-
-    respond_to do |format|
-      if @category.save(params[:category]) 
-        format.html do
-          flash[:notice] = _('Category was successfully created.')
-          #redirect_to(@category, :notice => "Category was successfully created")
-          redirect_to :action => "new"
-        end 
-        format.js do 
-          @category.save
-          @article = Article.new
-          @article.categories << @category
-          return render(:partial => 'admin/content/categories')
-        end
-      else
-        format.html do
-          render :action => "new"
+      respond_to do |format|
+        if @category.save
+          format.html do
+            flash[:notice] = _('Category was successfully created.')
+            #redirect_to(@category, :notice => "Category was successfully created")
+            redirect_to :action => "new"
+            return
+          end 
+          format.js do 
+            @category.save
+            @article = Article.new
+            @article.categories << @category
+            return render(:partial => 'admin/content/categories')
+          end
+        else
+          format.html do
+            render :action => "new"
+            return 
+          end
         end
       end
-    end
-  end
-
-  def destroy
-    @record = Category.find(params[:id])
-    return(render 'admin/shared/destroy') unless request.post?
-
-    @record.destroy
-    redirect_to :action => 'new'
-  end
-
-  private
-
-  def process_new_category
-  end
-
-  def save_category
-    if @category.save!
-      flash[:notice] = _('Category was successfully saved.')
     else
-      flash[:error] = _('Category could not be saved.')
+      @category = Category.new
+      respond_to do |format|
+        format.html #new.html.erb
+        format.js { 
+          @category = Category.new
+        }
+      end
     end
-    redirect_to :action => 'new'
+
   end
 
-end
+    def create
+    end
+
+    def destroy
+      @record = Category.find(params[:id])
+      return(render 'admin/shared/destroy') unless request.post?
+
+      @record.destroy
+      redirect_to :action => 'new'
+    end
+
+    private
+
+    def save_category
+      if @category.save!
+        flash[:notice] = _('Category was successfully saved.')
+      else
+        flash[:error] = _('Category could not be saved.')
+      end
+      redirect_to :action => 'new'
+    end
+
+  end
