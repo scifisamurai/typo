@@ -4,14 +4,30 @@ class Admin::CategoriesController < Admin::BaseController
   def index; redirect_to :action => 'new' ; end
 
   def edit
-    #@category = Category.find(params[:id])
-   
-    new_or_edit
+    @categories = Category.find(:all)
+    @category = Category.find(params[:id]) 
+    @category.attributes = params[:category] 
+
+    if request.post?
+      respond_to do |format|
+        format.html { save_category }
+        format.js do 
+          @category.save
+          @article = Article.new
+          @article.categories << @category
+          return render(:partial => 'admin/content/categories')
+        end
+      end
+    end
   end
 
   def new 
+    @categories = Category.find(:all)
+
     respond_to do |format|
-      format.html { new_or_edit }
+      format.html do
+        process_new_category
+      end
       format.js { 
         @category = Category.new
       }
@@ -28,23 +44,14 @@ class Admin::CategoriesController < Admin::BaseController
 
   private
 
-  def new_or_edit
-    @categories = Category.find(:all)
-    unless params[:id] == nil
-      @category = Category.find(params[:id]) 
-      @category.attributes = params[:category] 
-    end
+  def process_new_category
     if request.post?
       respond_to do |format|
         format.html do
-          if params[:id]
-           save_category 
-          else
-           if Category.create!(params[:category]) 
-             flash[:notice] = _('Category was successfully created.')
-             redirect_to :action => 'new'
-           end
-          end
+            if Category.create!(params[:category]) 
+              flash[:notice] = _('Category was successfully created.')
+              redirect_to :action => 'new'
+            end
         end 
         format.js do 
           @category.save
@@ -53,9 +60,7 @@ class Admin::CategoriesController < Admin::BaseController
           return render(:partial => 'admin/content/categories')
         end
       end
-      return
     end
-    render 'new'
   end
 
   def save_category
