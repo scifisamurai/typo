@@ -35,7 +35,7 @@ class Admin::CategoriesController < Admin::BaseController
       respond_to do |format|
         if @category.save
           format.html do
-            flash[:notice] = _('Category was successfully created.')
+            flash[:notice] = _('Category was successfully saved.')
             #redirect_to(@category, :notice => "Category was successfully created")
             redirect_to :action => "new"
             return
@@ -48,7 +48,8 @@ class Admin::CategoriesController < Admin::BaseController
           end
         else
           format.html do
-            render :action => "new"
+            flash[:error] = _('Category could not be saved.')
+            redirect_to :action => "new"
             return 
           end
         end
