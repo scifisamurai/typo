@@ -9,6 +9,8 @@ class Article < Content
   serialize :settings, Hash
 
   content_fields :body, :extended
+  
+  #validate :is_user_admin :on => :merge_with
 
   validates_uniqueness_of :guid
   validates_presence_of :title
@@ -417,8 +419,8 @@ class Article < Content
     user.admin? || user_id == user.id
   end
 
-  def merge_with(other_article_id = 0)
-    unless other_article_id == 0 && self.user.admin? == false
+  def merge_with(other_article_id)
+    unless self.user.admin? == false
       #puts "Merging article #{self.id} with #{other_article_id}"
       article_to_merge = Article.find(other_article_id)
       self.body = self.body.to_s + article_to_merge.body 
@@ -435,6 +437,8 @@ class Article < Content
       article_to_destroy = Article.find(other_article_id)
       article_to_destroy.destroy
       self
+    else
+      errors.add_to_base("User is not an admin")
     end
   end
 
