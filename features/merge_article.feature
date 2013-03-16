@@ -25,7 +25,7 @@ Feature: Merge Articles
     When I follow "Star Trek"
     Then I should not see "Error, you are not allowed to perform this action"
     And I should see "Merge Articles"
-    When I fill in "article_merge_with" with "4"
+    When I fill in "merge_with" with "4"
     And I press "Merge"
     Then I should not see "Star Trek 2"
     When I follow "Star Trek"
@@ -39,7 +39,7 @@ Feature: Merge Articles
     Then I should see "Star Trek"
     And I should see "Star Trek 2"
     When I follow "Star Trek"
-    And I fill in "article_merge_with" with "4"
+    And I fill in "merge_with" with "4"
     And I press "Merge"
     Then "Star Trek" should have either "admin" or "publisher" as the author
   
@@ -49,7 +49,7 @@ Feature: Merge Articles
     Then I should see "Star Trek"
     And I should see "Star Trek 2"
     When I follow "Star Trek"
-    And I fill in "article_merge_with" with "4"
+    And I fill in "merge_with" with "4"
     And I press "Merge"
     Then I should not see "Star Trek 2"
     When I follow "Star Trek"
