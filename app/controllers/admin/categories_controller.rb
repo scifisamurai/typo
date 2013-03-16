@@ -2,7 +2,12 @@ class Admin::CategoriesController < Admin::BaseController
   cache_sweeper :blog_sweeper
 
   def index; redirect_to :action => 'new' ; end
-  def edit; new_or_edit;  end
+
+  def edit
+    #@category = Category.find(params[:id])
+   
+    new_or_edit
+  end
 
   def new 
     respond_to do |format|
@@ -31,7 +36,16 @@ class Admin::CategoriesController < Admin::BaseController
     end
     if request.post?
       respond_to do |format|
-        format.html { save_category }
+        format.html do
+          if params[:id]
+           save_category 
+          else
+           if Category.create!(params[:category]) 
+             flash[:notice] = _('Category was successfully created.')
+             redirect_to :action => 'new'
+           end
+          end
+        end 
         format.js do 
           @category.save
           @article = Article.new
