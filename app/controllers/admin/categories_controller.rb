@@ -30,7 +30,7 @@ class Admin::CategoriesController < Admin::BaseController
     @categories = Category.find(:all)
 
     if request.post?  
-      @category = Category.new(params[:category])
+      @category = Category.new(params[:category]) if params[:id] == nil
 
       respond_to do |format|
         if @category.save
@@ -64,9 +64,6 @@ class Admin::CategoriesController < Admin::BaseController
         }
       end
     end
-  end
-
-  def create
   end
 
   def destroy
