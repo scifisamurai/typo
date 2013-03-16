@@ -3,25 +3,30 @@ class Admin::CategoriesController < Admin::BaseController
 
   def index; redirect_to :action => 'new' ; end
 
-  def edit
+  #GET /admin/categories/new
+  def new
+    puts "New called"
+    @category = Category.new
     @categories = Category.find(:all)
-    @category = Category.find(params[:id]) 
-    @category.attributes = params[:category] 
-
-    if request.post?
-      respond_to do |format|
-        format.html { save_category }
-        format.js do 
-          @category.save
-          @article = Article.new
-          @article.categories << @category
-          return render(:partial => 'admin/content/categories')
-        end
-      end
-    end
+    p @category
+    #new_or_edit
   end
 
-  def new 
+  #POST /admin/categories/edit
+  def edit
+    debugger
+
+    if params[:id] != nil
+      @category = Category.find(params[:id]) 
+      @category.attributes = params[:category] 
+    else
+      @category = Category.new
+    end
+
+    new_or_edit
+  end
+
+  def new_or_edit 
     @categories = Category.find(:all)
 
     if request.post?  
@@ -49,37 +54,37 @@ class Admin::CategoriesController < Admin::BaseController
         end
       end
     else
-      @category = Category.new
       respond_to do |format|
-        format.html #new.html.erb
+        format.html do
+          render :action => "new"
+        end
         format.js { 
           @category = Category.new
         }
       end
     end
-
   end
 
-    def create
-    end
-
-    def destroy
-      @record = Category.find(params[:id])
-      return(render 'admin/shared/destroy') unless request.post?
-
-      @record.destroy
-      redirect_to :action => 'new'
-    end
-
-    private
-
-    def save_category
-      if @category.save!
-        flash[:notice] = _('Category was successfully saved.')
-      else
-        flash[:error] = _('Category could not be saved.')
-      end
-      redirect_to :action => 'new'
-    end
-
+  def create
   end
+
+  def destroy
+    @record = Category.find(params[:id])
+    return(render 'admin/shared/destroy') unless request.post?
+
+    @record.destroy
+    redirect_to :action => 'new'
+  end
+
+  private
+
+  def save_category
+    if @category.save!
+      flash[:notice] = _('Category was successfully saved.')
+    else
+      flash[:error] = _('Category could not be saved.')
+    end
+    redirect_to :action => 'new'
+  end
+
+end
