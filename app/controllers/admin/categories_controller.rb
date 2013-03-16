@@ -22,15 +22,39 @@ class Admin::CategoriesController < Admin::BaseController
   end
 
   def new 
+    @category = Category.new
     @categories = Category.find(:all)
 
     respond_to do |format|
-      format.html do
-        process_new_category
-      end
+      format.html #new.html.erb
       format.js { 
         @category = Category.new
       }
+    end
+  end
+
+  def create
+    @category = Category.new(params[:category])
+    @categories = Category.find(:all)
+
+    respond_to do |format|
+      if @category.save(params[:category]) 
+        format.html do
+          flash[:notice] = _('Category was successfully created.')
+          #redirect_to(@category, :notice => "Category was successfully created")
+          redirect_to :action => "new"
+        end 
+        format.js do 
+          @category.save
+          @article = Article.new
+          @article.categories << @category
+          return render(:partial => 'admin/content/categories')
+        end
+      else
+        format.html do
+          render :action => "new"
+        end
+      end
     end
   end
 
@@ -45,22 +69,6 @@ class Admin::CategoriesController < Admin::BaseController
   private
 
   def process_new_category
-    if request.post?
-      respond_to do |format|
-        format.html do
-            if Category.create!(params[:category]) 
-              flash[:notice] = _('Category was successfully created.')
-              redirect_to :action => 'new'
-            end
-        end 
-        format.js do 
-          @category.save
-          @article = Article.new
-          @article.categories << @category
-          return render(:partial => 'admin/content/categories')
-        end
-      end
-    end
   end
 
   def save_category
